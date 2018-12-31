@@ -12,10 +12,22 @@ namespace AspNetCoreApp.Api.Infrastructure
         {
         }
 
-        public DbSet<Item> Items { get; set; }
+        public DbSet<Task> Items { get; set; }
+
+        public DbSet<Tag> Tags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            #region Configuration
+
+            modelBuilder.Entity<Task>().Property(p => p.Title).IsRequired();
+            modelBuilder.Entity<Task>().Property(p => p.Description).IsRequired();
+            modelBuilder.Entity<Task>().Property(p => p.TagId).IsRequired();
+
+            modelBuilder.Entity<Tag>().Property(p => p.Name).IsRequired();
+            
+            #endregion
+
             #region Shadow properties
 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes()
