@@ -9,7 +9,7 @@ namespace AspNetCoreApp.Api.Infrastructure
     public class AppContext : DbContext
     {
         public AppContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
-        { 
+        {
         }
 
         public DbSet<Item> Items { get; set; }
@@ -39,6 +39,13 @@ namespace AspNetCoreApp.Api.Infrastructure
 
             #endregion
 
+            #region QueryFilter
+
+            modelBuilder.Entity<IAuditEntity>()
+                .HasQueryFilter(post => EF.Property<bool>(post, "IsDeleted") == false);
+
+            #endregion
+
             base.OnModelCreating(modelBuilder);
         }
         public override int SaveChanges()
@@ -49,18 +56,21 @@ namespace AspNetCoreApp.Api.Infrastructure
         private void ApplyAuditInformation()
         {
             var modifiedEntities = ChangeTracker.Entries<IAuditEntity>()
-                    .Where(e => e.State == EntityState.Added 
-                                || e.State == EntityState.Modified 
+                    .Where(e => e.State == EntityState.Added
+                                || e.State == EntityState.Modified
                                         || e.State == EntityState.Deleted);
 
             foreach (var entity in modifiedEntities)
-            { 
-                if (entity.State == EntityState.Added) 
-                    entity.Property("CreateDate").CurrentValue = DateTime.UtcNow; 
-                else if (entity.State == EntityState.Modified) 
-                    entity.Property("ModifiedDate").CurrentValue = DateTime.UtcNow; 
-                else 
-                    entity.Property("IsDeleted").CurrentValue = true; 
+            {
+                if (entity.State == EntityState.Added)
+                {
+                    entity.Property("CreateDate").CurrentValue = DateTime.UtcNow;
+                    entity.Property("IsDeleted").CurrentValue = false;
+                }
+                else if (entity.State == EntityState.Modified)
+                    entity.Property("ModifiedDate").CurrentValue = DateTime.UtcNow;
+                else //EntityState.Deleted
+                    entity.Property("IsDeleted").CurrentValue = true;
             }
         }
     }
