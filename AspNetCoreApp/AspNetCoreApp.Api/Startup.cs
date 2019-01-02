@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using Swashbuckle.AspNetCore.Swagger;
+using Tag = AspNetCoreApp.Api.Domain.Tag;
 
 namespace AspNetCoreApp.Api
 {
@@ -40,6 +42,18 @@ namespace AspNetCoreApp.Api
                             .AllowAnyMethod();
                     });
             });
+
+            services.AddSwaggerGen(s =>
+            {
+                s.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "AspNetCoreApp Project",
+                    Description = "AspNetCoreApp API Swagger surface",
+                    Contact = new Contact { Name = "Atilla Yavuz", Email = "atillayavuz@gmail.com"}
+                });
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -55,10 +69,17 @@ namespace AspNetCoreApp.Api
 
             Mapper.Initialize(mapper =>
             {
-                mapper.CreateMap<Task, TaskDto>();
-                mapper.CreateMap<Tag, TagDto>();
+                mapper.CreateMap<Task, TaskDto>().ForMember(x => x.CreateDate,
+                    opt => opt.MapFrom(src => src.CreateDate.ToShortDateString()));
+                mapper.CreateMap<Tag, TagDto>().ForMember(x => x.CreateDate,
+                    opt => opt.MapFrom(src => src.CreateDate.ToShortDateString()));
             });
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "AspNetCoreApp API V1");
+            });
             app.UseCors("AllowAllOrigins");
             app.UseMvc();
         }
