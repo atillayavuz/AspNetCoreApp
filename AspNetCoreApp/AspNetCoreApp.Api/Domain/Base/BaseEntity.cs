@@ -5,6 +5,6 @@ namespace AspNetCoreApp.Api.Domain.Base
     public abstract class BaseEntity<T> where T : struct
     {
         [Key]
-        T Id { get; set; }
+        public T Id { get; set; }
     }
 }
