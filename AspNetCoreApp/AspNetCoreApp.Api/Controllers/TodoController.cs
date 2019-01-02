@@ -1,21 +1,26 @@
-﻿using AspNetCoreApp.Api.Infrastructure;
+﻿using AspNetCoreApp.Api.Domain;
+using AspNetCoreApp.Api.Dto;
+using AspNetCoreApp.Api.Infrastructure;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using Task = AspNetCoreApp.Api.Domain.Task;
 
 namespace AspNetCoreApp.Api.Controllers
-{ 
+{
     [Route("api/[controller]")]
     [ApiController]
     public class TodoController : ControllerBase
     {
         private readonly TodoContext _context;
-        public TodoController(TodoContext context)
+        private readonly IMapper _mapper;
+        public TodoController(TodoContext context,IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
-
+         
         [HttpGet]
         public ActionResult<IEnumerable<Task>> Get()
         {
@@ -24,12 +29,12 @@ namespace AspNetCoreApp.Api.Controllers
             if (result == null)
             {
                 return NotFound();
-            }
+            } 
 
-            return new ObjectResult(result);
+            return new ObjectResult(result.Select(s => _mapper.Map<TaskDto>(s)));
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}")] 
         public IActionResult Get(int id)
         {
             var result = _context.Tasks.FirstOrDefault(t => t.Id == id);
@@ -39,10 +44,10 @@ namespace AspNetCoreApp.Api.Controllers
                 return NotFound();
             }
 
-            return Ok(result);
+            return new ObjectResult(_mapper.Map<TaskDto>(result));
         }
 
-        [HttpPost]
+        [HttpPost] 
         public IActionResult Post([FromBody] Task task)
         {
             if (task == null)
@@ -74,14 +79,14 @@ namespace AspNetCoreApp.Api.Controllers
             taskEntity.Description = task.Description;
             _context.Tasks.Update(taskEntity);
             _context.SaveChanges();
-             
+
             return new NoContentResult();
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var taskEntity =_context.Tasks.FirstOrDefault(x => x.Id == id);
+            var taskEntity = _context.Tasks.FirstOrDefault(x => x.Id == id);
             if (taskEntity == null)
             {
                 return NotFound();
@@ -89,7 +94,7 @@ namespace AspNetCoreApp.Api.Controllers
             _context.Tasks.Remove(taskEntity);
             _context.SaveChanges();
 
-            return new NoContentResult(); 
+            return new NoContentResult();
         }
     }
 }

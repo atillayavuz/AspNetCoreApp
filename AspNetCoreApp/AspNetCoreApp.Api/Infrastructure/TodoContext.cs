@@ -42,35 +42,11 @@ namespace AspNetCoreApp.Api.Infrastructure
             modelBuilder.Entity<TaskTag>().HasKey(cd => new { cd.TagId, cd.TaskId });
 
             #endregion
-
-            #region Shadow properties
-
-            foreach (var entityType in modelBuilder.Model.GetEntityTypes()
-                  .Where(e => typeof(IAuditEntity).IsAssignableFrom(e.ClrType)))
-            {
-                modelBuilder.Entity(entityType.ClrType)
-                    .Property<DateTime>("CreateDate");
-
-                modelBuilder.Entity(entityType.ClrType)
-                    .Property<DateTime?>("ModifiedDate");
-
-                modelBuilder.Entity(entityType.ClrType)
-                    .Property<int>("CreatedBy");
-
-                modelBuilder.Entity(entityType.ClrType)
-                    .Property<int?>("ModifiedBy");
-
-                modelBuilder.Entity(entityType.ClrType)
-                   .Property<bool?>("IsDeleted");
-
-            }
-
-            #endregion
-
+              
             #region QueryFilter
 
-            modelBuilder.Entity<Task>().HasQueryFilter(item => !EF.Property<bool>(item, "IsDeleted"));
-            modelBuilder.Entity<Tag>().HasQueryFilter(item => !EF.Property<bool>(item, "IsDeleted"));
+            modelBuilder.Entity<Task>().HasQueryFilter(item => !item.IsDeleted);
+            modelBuilder.Entity<Tag>().HasQueryFilter(item => !item.IsDeleted);
 
             #endregion
 

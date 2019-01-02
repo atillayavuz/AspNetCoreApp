@@ -1,11 +1,9 @@
 ﻿using AspNetCoreApp.Api.Domain.Base;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace AspNetCoreApp.Api.Domain
 {
-    public class Tag : BaseEntity<int>, IAuditEntity
+    public class Tag : BaseAuditEntity<int>
     { 
         public string Name { get; set; } 
 
