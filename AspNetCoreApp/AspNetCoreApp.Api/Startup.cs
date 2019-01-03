@@ -1,17 +1,15 @@
-﻿using AspNetCoreApp.Api.Domain;
-using AspNetCoreApp.Api.Dto;
+﻿using AspNetCoreApp.Api.Application.Validation;
 using AspNetCoreApp.Api.Infrastructure;
-using AutoMapper;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using Swashbuckle.AspNetCore.Swagger;
-using Tag = AspNetCoreApp.Api.Domain.Tag;
+using System;
+using System.Linq;
 
 namespace AspNetCoreApp.Api
 {
@@ -28,9 +26,7 @@ namespace AspNetCoreApp.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<TodoContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddAutoMapper();
-            services.AddMvcCore().AddJsonFormatters();
+             
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAllOrigins",
@@ -50,31 +46,36 @@ namespace AspNetCoreApp.Api
                     Version = "v1",
                     Title = "AspNetCoreApp Project",
                     Description = "AspNetCoreApp API Swagger surface",
-                    Contact = new Contact { Name = "Atilla Yavuz", Email = "atillayavuz@gmail.com"}
+                    Contact = new Contact { Name = "Atilla Yavuz", Email = "atillayavuz@gmail.com" }
                 });
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddFluentValidation();
+
+            services.AddApplicationValidators();
+
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = (context) =>
+                {
+                    var errors = context.ModelState.Values.SelectMany(x => x.Errors.Select(p => p.ErrorMessage)).ToList();
+                    var result = new
+                    { 
+                        Message = "Validation errors",
+                        Errors = errors
+                    };
+                    return new BadRequestObjectResult(result);
+                };
+            });
         }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            //Initialize(app.ApplicationServices);
-
+        {  
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            Mapper.Initialize(mapper =>
-            {
-                mapper.CreateMap<Task, TaskDto>().ForMember(x => x.CreateDate,
-                    opt => opt.MapFrom(src => src.CreateDate.ToShortDateString()));
-                mapper.CreateMap<Tag, TagDto>().ForMember(x => x.CreateDate,
-                    opt => opt.MapFrom(src => src.CreateDate.ToShortDateString()));
-            });
-
+             
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -82,15 +83,6 @@ namespace AspNetCoreApp.Api
             });
             app.UseCors("AllowAllOrigins");
             app.UseMvc();
-        }
-        public static void Initialize(IServiceProvider service)
-        {
-            using (var serviceScope = service.CreateScope())
-            {
-                var scopeServiceProvider = serviceScope.ServiceProvider;
-                var db = scopeServiceProvider.GetRequiredService<TodoContext>();
-                db.Database.Migrate();
-            }
-        }
-    }
+        } 
+    } 
 }

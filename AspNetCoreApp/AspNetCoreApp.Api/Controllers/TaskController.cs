@@ -1,40 +1,37 @@
-﻿using AspNetCoreApp.Api.Domain;
+﻿using AspNetCoreApp.Api.Application.Mapping;
 using AspNetCoreApp.Api.Dto;
-using AspNetCoreApp.Api.Infrastructure;
-using AutoMapper;
+using AspNetCoreApp.Api.Infrastructure; 
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
-using Task = AspNetCoreApp.Api.Domain.Task;
+using System.Threading.Tasks;
 
 namespace AspNetCoreApp.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TodoController : ControllerBase
+    public class TaskController : ControllerBase
     {
-        private readonly TodoContext _context;
-        private readonly IMapper _mapper;
-        public TodoController(TodoContext context,IMapper mapper)
+        private readonly TodoContext _context; 
+        public TaskController(TodoContext context )
         {
-            _context = context;
-            _mapper = mapper;
+            _context = context; 
         }
-         
+
         [HttpGet]
-        public ActionResult<IEnumerable<Task>> Get()
+        public ActionResult<IEnumerable<TaskDto>> Get()
         {
             var result = _context.Tasks.ToList();
 
             if (result == null)
             {
                 return NotFound();
-            } 
+            }
 
-            return new ObjectResult(result.Select(s => _mapper.Map<TaskDto>(s)));
+            return new ObjectResult(result.Select(s => s.MapToTaskDto()));
         }
 
-        [HttpGet("{id}")] 
+        [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
             var result = _context.Tasks.FirstOrDefault(t => t.Id == id);
@@ -44,16 +41,18 @@ namespace AspNetCoreApp.Api.Controllers
                 return NotFound();
             }
 
-            return new ObjectResult(_mapper.Map<TaskDto>(result));
+            return new ObjectResult(result.MapToTaskDto());
         }
 
-        [HttpPost] 
-        public IActionResult Post([FromBody] Task task)
+        [HttpPost]
+        public IActionResult Post([FromBody] TaskDto model)
         {
-            if (task == null)
+            if (model == null)
             {
                 return BadRequest();
             }
+
+            var task = model.MapToTask();
 
             _context.Tasks.Add(task);
             _context.SaveChanges();
@@ -62,21 +61,21 @@ namespace AspNetCoreApp.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Task task)
+        public IActionResult Put([FromBody] TaskDto model)
         {
-            if (task == null && task.Id != id)
+            if (model == null)
             {
                 return BadRequest();
             }
 
-            var taskEntity = _context.Tasks.FirstOrDefault(x => x.Id == id);
+            var taskEntity = _context.Tasks.FirstOrDefault(x => x.Id == model.Id);
             if (taskEntity == null)
             {
                 return NotFound();
             }
-
-            taskEntity.Title = task.Title;
-            taskEntity.Description = task.Description;
+              
+            taskEntity.Title = model.Title;
+            taskEntity.Description = model.Description;
             _context.Tasks.Update(taskEntity);
             _context.SaveChanges();
 

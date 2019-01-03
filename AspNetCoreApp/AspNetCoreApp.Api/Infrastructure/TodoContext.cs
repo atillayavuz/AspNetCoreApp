@@ -20,7 +20,7 @@ namespace AspNetCoreApp.Api.Infrastructure
         public DbSet<TaskTag> TaskTags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {   
+        {
             #region Configuration
 
             modelBuilder.Entity<Task>().HasMany(c => c.TaskTags)
@@ -42,7 +42,7 @@ namespace AspNetCoreApp.Api.Infrastructure
             modelBuilder.Entity<TaskTag>().HasKey(cd => new { cd.TagId, cd.TaskId });
 
             #endregion
-              
+
             #region QueryFilter
 
             modelBuilder.Entity<Task>().HasQueryFilter(item => !item.IsDeleted);
