@@ -1,6 +1,5 @@
 ﻿using AspNetCoreApp.Api.Dto;
 using FluentValidation;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AspNetCoreApp.Api.Application.Validation

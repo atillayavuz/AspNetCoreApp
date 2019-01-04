@@ -1,10 +1,10 @@
 ﻿using AspNetCoreApp.Api.Application.Mapping;
 using AspNetCoreApp.Api.Dto;
-using AspNetCoreApp.Api.Infrastructure; 
+using AspNetCoreApp.Api.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace AspNetCoreApp.Api.Controllers
 {
@@ -19,6 +19,8 @@ namespace AspNetCoreApp.Api.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public ActionResult<IEnumerable<TaskDto>> Get()
         {
             var result = _context.Tasks.ToList();
@@ -32,6 +34,8 @@ namespace AspNetCoreApp.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public IActionResult Get(int id)
         {
             var result = _context.Tasks.FirstOrDefault(t => t.Id == id);
@@ -45,6 +49,9 @@ namespace AspNetCoreApp.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
         public IActionResult Post([FromBody] TaskDto model)
         {
             if (model == null)
@@ -60,7 +67,11 @@ namespace AspNetCoreApp.Api.Controllers
             return Ok();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut] 
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesDefaultResponseType]
         public IActionResult Put([FromBody] TaskDto model)
         {
             if (model == null)
@@ -79,10 +90,13 @@ namespace AspNetCoreApp.Api.Controllers
             _context.Tasks.Update(taskEntity);
             _context.SaveChanges();
 
-            return new NoContentResult();
+            return Ok();
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public IActionResult Delete(int id)
         {
             var taskEntity = _context.Tasks.FirstOrDefault(x => x.Id == id);
@@ -93,7 +107,7 @@ namespace AspNetCoreApp.Api.Controllers
             _context.Tasks.Remove(taskEntity);
             _context.SaveChanges();
 
-            return new NoContentResult();
+            return Ok();
         }
     }
 }
