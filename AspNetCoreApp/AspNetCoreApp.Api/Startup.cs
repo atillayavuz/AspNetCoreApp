@@ -75,7 +75,9 @@ namespace AspNetCoreApp.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-             
+
+            app.UseMiddleware<ExceptionMiddleware>();
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
