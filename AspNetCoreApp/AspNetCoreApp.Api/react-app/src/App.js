@@ -60,41 +60,40 @@ class App extends Component {
     const { tasks, title, description } = this.state;
     return (
       <div className="App">
-        <header className="App-header">
-          <form onSubmit={this.handleSubmit}>
-            <div className={"form-group" + (!title ? " has-error" : "")}>
-              <label htmlFor="title">Title</label>
-              <input
-                type="text"
-                className="form-control"
-                name="title"
-                value={title}
-                onChange={this.handleChangeTitle}
-              />
-              {/* {submitted && !taskModel.title && (
-                <div className="help-block">Username is required</div>
-              )} */}
-              <label htmlFor="description">Description</label>
-              <input
-                type="text"
-                className="form-control"
-                name="description"
-                value={description}
-                onChange={this.handleChangeDescription}
-              />
-              <div className="form-group">
-                <button className="btn btn-primary">Save</button>
-              </div>
+        <form onSubmit={this.handleSubmit}>
+          <div className={"form-group" + (!title ? " has-error" : "")}>
+            <label htmlFor="title" className="">
+              Title
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              name="title"
+              value={title}
+              onChange={this.handleChangeTitle}
+            />
+          </div>
+          <div className={"form-group" + (!description ? " has-error" : "")}>
+            <label htmlFor="description">Description</label>
+            <input
+              type="text"
+              className="form-control"
+              name="description"
+              value={description}
+              onChange={this.handleChangeDescription}
+            />
+            <div className="form-group">
+              <button className="btn btn-primary">Kaydet</button>
             </div>
-          </form>
-          <p>
-            {tasks.map(task => {
-              return (
-                <span key={task.id}>{task.title + " " + task.description}</span>
-              );
-            })}
-          </p>
-        </header>
+          </div>
+        </form>
+        <p>
+          {tasks.map(task => {
+            return (
+              <span key={task.id}>{task.title + " " + task.description}</span>
+            );
+          })}
+        </p>
       </div>
     );
   }
