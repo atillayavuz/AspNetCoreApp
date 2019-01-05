@@ -22,7 +22,7 @@ namespace AspNetCoreApp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
         public ActionResult<IEnumerable<TaskDto>> Get()
-        {
+        {  
             var result = _context.Tasks.ToList();
 
             if (result == null)
