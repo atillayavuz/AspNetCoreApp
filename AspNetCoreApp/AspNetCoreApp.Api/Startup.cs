@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace AspNetCoreApp.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<TodoContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-             
+
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAllOrigins",
@@ -50,6 +51,15 @@ namespace AspNetCoreApp.Api
                 });
             });
 
+
+            services.AddLogging(logging =>
+            {
+                logging.AddConfiguration(Configuration.GetSection("Logging"));
+                logging.AddConsole();
+                logging.AddDebug();
+                logging.AddEventSourceLogger();
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddFluentValidation();
 
             services.AddApplicationValidators();
@@ -60,7 +70,7 @@ namespace AspNetCoreApp.Api
                 {
                     var errors = context.ModelState.Values.SelectMany(x => x.Errors.Select(p => p.ErrorMessage)).ToList();
                     var result = new
-                    { 
+                    {
                         Message = "Validation errors",
                         Errors = errors
                     };
@@ -68,14 +78,14 @@ namespace AspNetCoreApp.Api
                 };
             });
         }
-         
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {  
+
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
+              
             app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseSwagger();
@@ -85,6 +95,6 @@ namespace AspNetCoreApp.Api
             });
             app.UseCors("AllowAllOrigins");
             app.UseMvc();
-        } 
-    } 
+        }
+    }
 }

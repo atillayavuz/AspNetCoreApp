@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetCoreApp.Api.Controllers
 {
@@ -12,17 +13,19 @@ namespace AspNetCoreApp.Api.Controllers
     [ApiController]
     public class TaskController : ControllerBase
     {
-        private readonly TodoContext _context; 
-        public TaskController(TodoContext context )
+        private readonly TodoContext _context;
+        public ILogger<TaskController> _logger { get; }
+        public TaskController(TodoContext context, ILogger<TaskController> logger)
         {
-            _context = context; 
+            _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
         public ActionResult<IEnumerable<TaskDto>> Get()
-        {  
+        { 
             var result = _context.Tasks.ToList();
 
             if (result == null)
@@ -67,7 +70,7 @@ namespace AspNetCoreApp.Api.Controllers
             return Ok();
         }
 
-        [HttpPut] 
+        [HttpPut]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -84,7 +87,7 @@ namespace AspNetCoreApp.Api.Controllers
             {
                 return NotFound();
             }
-              
+
             taskEntity.Title = model.Title;
             taskEntity.Description = model.Description;
             _context.Tasks.Update(taskEntity);
