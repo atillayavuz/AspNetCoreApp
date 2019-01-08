@@ -25,14 +25,17 @@ namespace AspNetCoreApp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
         public ActionResult<IEnumerable<TaskDto>> Get()
-        { 
+        {
+            _logger.LogInformation("Task_Get Api started.");
+
             var result = _context.Tasks.ToList();
 
             if (result == null)
             {
                 return NotFound();
-            }
+            } 
 
+            _logger.LogInformation("Task_Get Api finished.");
             return new ObjectResult(result.Select(s => s.MapToTaskDto()));
         }
 

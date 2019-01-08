@@ -8,16 +8,32 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
+using System.IO;
 using System.Linq;
 
 namespace AspNetCoreApp.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
+        { 
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                //.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                //.MinimumLevel.Override("System", LogEventLevel.Warning) 
+                .Enrich.WithProperty("Application", "AspNetCoreApp_v1")
+                .MinimumLevel.Debug()
+                .WriteTo.RollingFile(Path.Combine(env.ContentRootPath + "/logs", "log-{Date}.txt"), outputTemplate: "{Timestamp:HH:mm:ss} [{Level}] {Application}: {Message}{NewLine}{Exception}") 
+                .CreateLogger();
+
+
+            //var file = File.CreateText(env.ContentRootPath + "/logs/serilog_self_.txt");
+            //Serilog.Debugging.SelfLog.Enable(msg => TextWriter.Synchronized(file));
+
             Configuration = configuration;
         }
 
@@ -50,16 +66,7 @@ namespace AspNetCoreApp.Api
                     Contact = new Contact { Name = "Atilla Yavuz", Email = "atillayavuz@gmail.com" }
                 });
             });
-
-
-            services.AddLogging(logging =>
-            {
-                logging.AddConfiguration(Configuration.GetSection("Logging"));
-                logging.AddConsole();
-                logging.AddDebug();
-                logging.AddEventSourceLogger();
-            });
-
+              
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddFluentValidation();
 
             services.AddApplicationValidators();
@@ -81,11 +88,12 @@ namespace AspNetCoreApp.Api
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddSerilog();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-              
+
             app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseSwagger();
