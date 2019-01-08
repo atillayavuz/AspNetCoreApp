@@ -260,4 +260,9 @@ paket-files/
 __pycache__/
 *.pyc
 
+#EF Migration folder
 Migrations/
+
+#Log folder
+logs/
+
