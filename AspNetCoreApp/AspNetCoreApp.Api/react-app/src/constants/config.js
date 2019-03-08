@@ -1,0 +1,1 @@
+﻿export const SERVICE_BASE = "http://localhost:5000/";
