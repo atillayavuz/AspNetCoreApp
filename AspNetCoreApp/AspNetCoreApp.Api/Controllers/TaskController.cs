@@ -1,11 +1,11 @@
 ﻿using AspNetCoreApp.Api.Application.Mapping;
 using AspNetCoreApp.Api.Dto;
 using AspNetCoreApp.Api.Infrastructure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace AspNetCoreApp.Api.Controllers
 {
@@ -54,6 +54,7 @@ namespace AspNetCoreApp.Api.Controllers
             return new ObjectResult(result.MapToTaskDto());
         }
 
+        [Route("AddTask")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -69,10 +70,12 @@ namespace AspNetCoreApp.Api.Controllers
 
             _context.Tasks.Add(task);
             _context.SaveChanges();
-
-            return Ok();
+            
+            return new ObjectResult(task.MapToTaskDto());
         }
 
+
+        [Route("UpdateTask")]
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

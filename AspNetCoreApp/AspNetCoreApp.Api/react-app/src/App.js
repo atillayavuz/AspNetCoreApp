@@ -1,4 +1,4 @@
-import React, { Component } from "react"; 
+import React, { Component } from "react";
 import "./App.css";
 import { SERVICE_BASE } from './constants/config';
 
@@ -10,15 +10,16 @@ class App extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.state = {
             title: "",
-            description: "", 
+            description: "",
             tasks: []
         };
+        this.serviceBase = SERVICE_BASE
     }
     componentDidMount() {
         this.getTasks();
     }
 
-    getTasks() { 
+    getTasks() {
         fetch(`${SERVICE_BASE}api/Task`)
             .then(response => response.json())
             .then(tasks => this.setState({ tasks }));
@@ -34,26 +35,27 @@ class App extends Component {
 
     handleSubmit(e) {
         e.preventDefault();
-        const url = this.state.baseUrl + "api/Task";
         const { title, description } = this.state;
-
-        fetch(`${SERVICE_BASE}/api/Task`, {
+        let self = this;
+        
+        fetch(`${SERVICE_BASE}api/Task/AddTask`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ Title: title, Description: description })
         })
-            .then(task => {
-                debugger;
-                if (task.status == 200) {
-                    this.setState({ title: "", description: "" });
-                    this.getTasks();
-                }
+        .then(function (res) {  return res.json(); })
+        .then(function (task) { 
+            self.setState({
+                tasks: [...self.state.tasks, task],
+                title: '',
+                description : ''
             })
-            .catch(err => console.log);
+        })
+        .catch(err => console.log)
     }
-
+    
     render() {
         const { tasks, title, description } = this.state;
         return (
