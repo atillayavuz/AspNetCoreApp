@@ -1,10 +1,16 @@
 import React from "react";
-import Aux from "../../hoc/aux";
+import { MDBContainer} from 'mdbreact';
+import Aux from "../../hoc/hoc";
+import Navbar from './Navbar';
 
 const layout = props => (
-  <Aux>
-    <div>Header </div>
-    <main>{props.children}</main>
-  </Aux>
+    <Aux>
+        <Navbar />
+        <main>
+            <MDBContainer className="text-center my-5">
+                {props.children}
+            </MDBContainer>
+        </main>
+    </Aux>
 );
 export default layout;
