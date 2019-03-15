@@ -1,18 +1,13 @@
 import React, { Component } from "react";
 import "./App.css";
-import Layout from "./components/Layout/Layout";
-import Todo from "./container/Todo";
+import Main from "./components/Layout/Main";
+import Navbar from "./components/Layout/Navbar";
 
-class App extends Component {
-  render() {
-    return (
-      <div>
-        <Layout>
-          <Todo />
-        </Layout>
-      </div>
-    );
-  }
-}
+const App = () => (
+  <div>
+    <Navbar />
+    <Main />
+  </div>
+);
 
 export default App;
