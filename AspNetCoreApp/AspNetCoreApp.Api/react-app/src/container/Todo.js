@@ -1,13 +1,7 @@
 import React, { Component } from "react";
 import { SERVICE_BASE } from "../constants/config";
-import {
-  MDBContainer,
-  MDBRow,
-  MDBCol,
-  MDBBtn,
-  MDBListGroupItem,
-  MDBListGroup
-} from "mdbreact";
+import { MDBContainer, MDBRow, MDBCol, MDBBtn, MDBListGroup } from "mdbreact";
+import TodoItem from "./TodoItem";
 
 class Todo extends Component {
   constructor(props) {
@@ -15,6 +9,7 @@ class Todo extends Component {
     this.handleChangeTitle = this.handleChangeTitle.bind(this);
     this.handleChangeDescription = this.handleChangeDescription.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.removeTodo = this.removeTodo.bind(this);
     this.state = {
       title: "",
       description: "",
@@ -22,6 +17,7 @@ class Todo extends Component {
     };
     this.serviceBase = SERVICE_BASE;
   }
+
   componentDidMount() {
     this.getTasks();
   }
@@ -36,6 +32,22 @@ class Todo extends Component {
     this.setState({ title: e.target.value });
   }
 
+  removeTodo(e) {
+    const self = this;
+    fetch(`${SERVICE_BASE}api/Task/${e.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(function(res) {
+      self.setState({
+        tasks: self.state.tasks.filter(function(task) {
+          return task != e;
+        })
+      });
+    });
+  }
+
   handleChangeDescription(e) {
     this.setState({ description: e.target.value });
   }
@@ -45,7 +57,7 @@ class Todo extends Component {
     const { title, description } = this.state;
     let self = this;
 
-    fetch(`${SERVICE_BASE}api/Task/AddTask`, {
+    fetch(`${SERVICE_BASE}api/Task`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -99,6 +111,7 @@ class Todo extends Component {
                   value={description}
                   onChange={this.handleChangeDescription}
                 />
+
                 <div className="text-center mt-4">
                   <MDBBtn color="indigo" type="submit">
                     SAve
@@ -111,11 +124,11 @@ class Todo extends Component {
               <MDBListGroup style={{ width: "22rem" }}>
                 {tasks.map(task => {
                   return (
-                    <MDBListGroupItem href="#" key={task.id}>
-                      {task.title + " " + task.description + " "}
-                      <i className="far fa-check-circle" />{" "}
-                      <i className="far fa-times-circle" />
-                    </MDBListGroupItem>
+                    <TodoItem
+                      key={task.id}
+                      item={task}
+                      removeTodo={this.removeTodo}
+                    />
                   );
                 })}
               </MDBListGroup>

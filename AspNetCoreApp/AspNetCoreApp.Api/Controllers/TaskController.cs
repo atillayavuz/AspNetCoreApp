@@ -53,8 +53,7 @@ namespace AspNetCoreApp.Api.Controllers
 
             return new ObjectResult(result.MapToTaskDto());
         }
-
-        [Route("AddTask")]
+         
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

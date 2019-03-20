@@ -6,7 +6,9 @@ import Navbar from "./components/Layout/Navbar";
 const App = () => (
   <div>
     <Navbar />
-    <Main />
+    <div className="container">
+      <Main />
+    </div>
   </div>
 );
 
