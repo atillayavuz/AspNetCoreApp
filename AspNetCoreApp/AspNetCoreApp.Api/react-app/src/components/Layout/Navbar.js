@@ -37,7 +37,6 @@ class Navbar extends React.Component {
             <MDBNavbarNav right>
               <MDBNavItem>
                 <Link to="/Profile">
-                  <MDBIcon icon="user" className="d-inline-inline" />{" "}
                   <div className="d-none d-md-inline">Profile</div>
                 </Link>
               </MDBNavItem>
