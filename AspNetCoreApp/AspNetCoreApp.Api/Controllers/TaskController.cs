@@ -55,9 +55,9 @@ namespace AspNetCoreApp.Api.Controllers
         }
          
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesDefaultResponseType]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[ProducesDefaultResponseType]
         public IActionResult Post([FromBody] TaskDto model)
         {
             if (model == null)
@@ -69,8 +69,8 @@ namespace AspNetCoreApp.Api.Controllers
 
             _context.Tasks.Add(task);
             _context.SaveChanges();
-            
-            return new ObjectResult(task.MapToTaskDto());
+
+            return Ok();
         }
 
 
@@ -101,6 +101,7 @@ namespace AspNetCoreApp.Api.Controllers
             return Ok();
         }
 
+        [Route("DeleteTask")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

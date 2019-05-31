@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import axios from "axios";
 import { SERVICE_BASE } from "../constants/config";
 import { MDBContainer, MDBRow, MDBCol, MDBBtn, MDBListGroup } from "mdbreact";
 import TodoItem from "./TodoItem";
@@ -23,9 +24,10 @@ class Todo extends Component {
   }
 
   getTasks() {
-    fetch(`${SERVICE_BASE}api/Task`)
-      .then(response => response.json())
-      .then(tasks => this.setState({ tasks }));
+    axios.get(`${SERVICE_BASE}api/Task`).then(res => {
+      const tasks = res.data;
+      this.setState({ tasks: tasks });
+    });
   }
 
   handleChangeTitle(e) {
@@ -34,15 +36,10 @@ class Todo extends Component {
 
   removeTodo(e) {
     const self = this;
-    fetch(`${SERVICE_BASE}api/Task/${e.id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }).then(function(res) {
+    axios.delete(`${SERVICE_BASE}api/Task/${e.id}`).then(res => {
       self.setState({
         tasks: self.state.tasks.filter(function(task) {
-          return task != e;
+          return task !== e;
         })
       });
     });
@@ -56,27 +53,43 @@ class Todo extends Component {
     e.preventDefault();
     const { title, description } = this.state;
     let self = this;
+    const data = { Title: title, Description: description };
 
-    fetch(`${SERVICE_BASE}api/Task`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ Title: title, Description: description })
-    })
-      .then(function(res) {
-        debugger;
-        return res.json();
-      })
-      .then(function(task) {
+    let params = new URLSearchParams();
+    params.append("description", description);
+    params.append("title", title);
+
+    axios
+      .post(`${SERVICE_BASE}api/Task`, params)
+      .then(res => {
         debugger;
         self.setState({
-          tasks: [...self.state.tasks, task],
+          tasks: [...self.state.tasks, data],
           title: "",
           description: ""
         });
       })
-      .catch(err => console.log);
+      .catch(error => {
+        debugger;
+        console.log(error.response);
+      });
+    // let params = new URLSearchParams();
+    // params.append("description", description);
+    // params.append("title", title);
+    // axios({
+    //   method: "POST",
+    //   url: `${SERVICE_BASE}api/Task`,
+    //   headers: {
+    //     "content-type": "application/json"
+    //   },
+    //   data: params
+    // }).then(obj => {
+    //   self.setState({
+    //     tasks: [...self.state.tasks, data],
+    //     title: "",
+    //     description: ""
+    //   });
+    // });
   }
 
   render() {

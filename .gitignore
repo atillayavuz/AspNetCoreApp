@@ -266,3 +266,4 @@ Migrations/
 #Log folder
 logs/
 
+/AspNetCoreApp/AspNetCoreApp.Api/react-app/src/hoc/aux.js
